@@ -21,12 +21,6 @@ variable "prefix" {
   default     = "ref"
 }
 
-variable "state_bucket_name" {
-  type        = string
-  description = "Name of the pre existing Terraform state bucket, excluded from this configuration."
-  default     = null
-}
-
 variable "alert_emails" {
   type        = list(string)
   description = "Recipients for Cockpit technical alerts."
