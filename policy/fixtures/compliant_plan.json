@@ -1,0 +1,39 @@
+{
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "module.app_server.scaleway_instance_server.this",
+      "mode": "managed",
+      "type": "scaleway_instance_server",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "ref-app-01",
+          "type": "PLAY2-PICO",
+          "tags": ["managed-by:terraform", "stack:ref", "env:sandbox", "owner:platform", "role:app"],
+          "root_volume": [{"size_in_gb": 20, "delete_on_termination": true}]
+        },
+        "after_unknown": {"project_id": true}
+      }
+    },
+    {
+      "address": "module.data_bucket.scaleway_object_bucket.this",
+      "mode": "managed",
+      "type": "scaleway_object_bucket",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "ref-data",
+          "project_id": "11111111-1111-1111-1111-111111111111",
+          "tags": {"managed-by": "terraform", "stack": "ref", "env": "sandbox", "owner": "platform"},
+          "versioning": [{"enabled": true}],
+          "lifecycle_rule": [
+            {"id": "abort-incomplete-multipart-uploads", "enabled": true, "abort_incomplete_multipart_upload_days": 7},
+            {"id": "expire-noncurrent-versions", "enabled": true, "noncurrent_version_expiration": [{"noncurrent_days": 30}]}
+          ]
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

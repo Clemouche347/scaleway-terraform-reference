@@ -1,0 +1,46 @@
+{
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "scaleway_instance_server.orphan",
+      "mode": "managed",
+      "type": "scaleway_instance_server",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "orphan",
+          "type": "GPU-3070-S",
+          "tags": ["Temporary", "stack:ref"],
+          "root_volume": [{"size_in_gb": 100, "delete_on_termination": false}]
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "scaleway_object_bucket.leaky",
+      "mode": "managed",
+      "type": "scaleway_object_bucket",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "leaky",
+          "project_id": "11111111-1111-1111-1111-111111111111",
+          "tags": {"managed-by": "terraform", "stack": "ref", "env": "sandbox", "owner": "platform"},
+          "versioning": [{"enabled": true}],
+          "lifecycle_rule": []
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "scaleway_instance_server.gone",
+      "mode": "managed",
+      "type": "scaleway_instance_server",
+      "change": {
+        "actions": ["delete"],
+        "after": null,
+        "after_unknown": {}
+      }
+    }
+  ]
+}

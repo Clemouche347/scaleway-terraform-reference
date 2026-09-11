@@ -1,0 +1,20 @@
+# Rule exemptions.
+#
+# Each entry suppresses one rule for one Terraform address until its expiry
+# date. After that date the rule fires again and a warning is raised, so an
+# exemption is a decision with a review date rather than a permanent hole.
+#
+#   rule     the rule ID as printed by conftest, for example ALLOC001
+#   address  a Terraform address, glob wildcards allowed
+#   reason   why, in one sentence, for whoever reads this in six months
+#   expires  YYYY-MM-DD, mandatory, an entry without it grants nothing
+#
+# Example:
+#
+# exemptions:
+#   - rule: COST001
+#     address: module.gpu_training.scaleway_instance_server.this
+#     reason: Model training bench approved by the platform team for Q4
+#     expires: 2026-12-31
+
+exemptions: []

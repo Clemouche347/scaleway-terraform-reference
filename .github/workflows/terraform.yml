@@ -1,0 +1,74 @@
+name: terraform
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# No Scaleway credentials anywhere in this workflow, on purpose. The repository
+# is public, and a plan or apply against a billed account has no business
+# running here. Everything below is static analysis.
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Format
+        run: terraform fmt -check -recursive
+
+      - name: Validate root stack
+        working-directory: live/sandbox
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate modules
+        run: |
+          for dir in modules/*/; do
+            echo "== $dir"
+            terraform -chdir="$dir" init -backend=false
+            terraform -chdir="$dir" validate
+          done
+
+      - uses: terraform-linters/setup-tflint@v4
+      - name: TFLint
+        run: tflint --recursive
+
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: open-policy-agent/setup-conftest@v0.5.0
+        with:
+          conftest_version: 0.62.0
+
+      - name: Policies reject a non compliant plan
+        run: |
+          if conftest test --policy policy --data policy/exemptions.yaml \
+              policy/fixtures/violating_plan.json; then
+            echo "the violating fixture passed, the policies are broken"
+            exit 1
+          fi
+
+      - name: Policies accept a compliant plan
+        run: |
+          conftest test --policy policy --data policy/exemptions.yaml \
+            policy/fixtures/compliant_plan.json
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m compileall finops
